@@ -7,6 +7,7 @@ pub enum Expr {
     Var(String),
     Assign(String, Box<Expr>),
     VarDecl(bool, String, Box<Expr>),
+    PrintStmt(Box<Expr>),
     Block(Vec<Expr>),
 }
 
@@ -62,7 +63,29 @@ impl Parser {
         match self.current_token() {
             Token::ConstVar => self.parse_var_declaration(true),
             Token::Mutate => self.parse_var_declaration(false),
+            Token::Print => self.parse_print(),
             _ => self.parse_assignment(),
+        }
+    }
+
+    fn parse_print(&mut self) -> Expr {
+        self.advance();
+
+        if let Token::LeftParen = self.current_token() {
+            self.advance();
+            let to_print = self.parse_expr();
+
+            if let Token::RightParen = self.current_token() {
+                self.advance();
+                if self.current_token() == Token::Semicolon {
+                    self.advance();
+                }
+                Expr::PrintStmt(Box::new(to_print))
+            } else {
+                panic!("Expected ')' after expression in print statement.");
+            }
+        } else {
+            panic!("Expected '(' after 'print'.");
         }
     }
 
