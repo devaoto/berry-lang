@@ -23,7 +23,7 @@ pub enum Token {
     RBracket,
     LBrace,
     RBrace,
-    Const, // Immutable variable
+    ConstVar, // Immutable variable
     Mutate, // Mutable variable
     Whether, // If
     Otherwise, // Else
@@ -290,7 +290,7 @@ pub fn tokenize(input: &str) -> Vec<Token> {
                     }
                 }
                 match ident.as_str() {
-                    "const" => tokens.push(Token::Const),
+                    "const" => tokens.push(Token::ConstVar),
                     "mutate" => tokens.push(Token::Mutate),
                     "whether" => tokens.push(Token::Whether),
                     "otherwise" => tokens.push(Token::Otherwise),
