@@ -7,6 +7,7 @@ pub enum Expr {
     Var(String),
     Assign(String, Box<Expr>),
     VarDecl(bool, String, Box<Expr>),
+    Block(Vec<Expr>),
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -29,15 +30,32 @@ impl Parser {
     }
 
     pub fn parse(&mut self) -> Expr {
-        self.parse_statement()
+        self.parse_block()
     }
 
     fn current_token(&self) -> Token {
-        self.tokens[self.pos].clone()
+        if self.pos >= self.tokens.len() { Token::EOF } else { self.tokens[self.pos].clone() }
     }
 
     fn advance(&mut self) {
-        self.pos += 1;
+        if self.pos < self.tokens.len() {
+            self.pos += 1;
+        }
+    }
+
+    fn parse_block(&mut self) -> Expr {
+        let mut statements = Vec::new();
+
+        while self.current_token() != Token::EOF {
+            let stmt = self.parse_statement();
+            statements.push(stmt);
+
+            if self.current_token() == Token::Semicolon {
+                self.advance();
+            }
+        }
+
+        Expr::Block(statements)
     }
 
     fn parse_statement(&mut self) -> Expr {
@@ -131,6 +149,7 @@ impl Parser {
                 self.advance();
                 Expr::Var(var_name)
             }
+            Token::EOF => panic!("Unexpected end of input"),
             _ => panic!("Unexpected token: {:?}", self.current_token()),
         }
     }
