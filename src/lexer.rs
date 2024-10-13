@@ -1,6 +1,6 @@
 #[derive(Debug, PartialEq, Clone)]
 pub enum Token {
-    Number(i32),
+    Number(f64),
     Plus,
     Minus,
     Asterisk,
@@ -274,7 +274,7 @@ pub fn tokenize(input: &str) -> Vec<Token> {
                         break;
                     }
                 }
-                match number.parse::<i32>() {
+                match number.parse::<f64>() {
                     Ok(n) => tokens.push(Token::Number(n)),
                     Err(_) => panic!("Invalid number found: {}", number),
                 }
